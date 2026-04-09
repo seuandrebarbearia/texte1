@@ -1,3 +1,4 @@
+
 // ELEMENTOS
 const menuLanches = document.getElementById("menu-lanches")
 const menuBebidas = document.getElementById("menu-bebidas")
@@ -12,7 +13,7 @@ const cartCounter = document.getElementById("cart-count")
 // ENTREGA
 const deliveryRadios = document.querySelectorAll('input[name="delivery"]')
 
-// MODAL
+// MODAL PRODUTO
 const productModal = document.getElementById("product-modal")
 const closeProductModal = document.getElementById("close-product-modal")
 const confirmBtn = document.getElementById("add-product-confirm")
@@ -49,7 +50,7 @@ cartModal.addEventListener("click", (event) => {
     }
 })
 
-// CLICK NOS PRODUTOS (FUNCIONA NOS DOIS MENUS)
+// CLICK NOS PRODUTOS
 function handleMenuClick(event) {
     const button = event.target.closest(".add-to-cart-btn")
 
@@ -78,6 +79,9 @@ productModal.addEventListener("click", (event) => {
 
 // CONFIRMAR PRODUTO
 confirmBtn.addEventListener("click", () => {
+
+    if (!selectedProduct) return
+
     addToCart(
         selectedProduct.name,
         selectedProduct.price,
@@ -86,14 +90,18 @@ confirmBtn.addEventListener("click", () => {
 
     observationInput.value = ""
     productModal.classList.add("hidden")
+    productModal.classList.remove("flex")
 })
 
 // ADICIONAR AO CARRINHO
 function addToCart(name, price, observation = "") {
     const item = cart.find(i => i.name === name && i.observation === observation)
 
-    if (item) item.quantity++
-    else cart.push({ name, price, quantity: 1, observation })
+    if (item) {
+        item.quantity++
+    } else {
+        cart.push({ name, price, quantity: 1, observation })
+    }
 
     saveCart()
     updateCartModal()
@@ -137,7 +145,7 @@ function updateCartModal() {
     const deliveryFee = getDeliveryFee()
     const total = subtotal + deliveryFee
 
-    cartTotal.textContent = total.toFixed(2)
+    cartTotal.textContent = `R$ ${total.toFixed(2)}`
 
     const totalItens = cart.reduce((acc, item) => acc + item.quantity, 0)
     cartCounter.textContent = totalItens
@@ -157,8 +165,11 @@ cartItemsContainer.addEventListener("click", (event) => {
         const index = cart.findIndex(i => i.name === name && i.observation === obs)
 
         if (index !== -1) {
-            if (cart[index].quantity > 1) cart[index].quantity--
-            else cart.splice(index, 1)
+            if (cart[index].quantity > 1) {
+                cart[index].quantity--
+            } else {
+                cart.splice(index, 1)
+            }
         }
     }
 
@@ -204,10 +215,12 @@ Total: R$ ${total.toFixed(2)}`
     cart = []
     saveCart()
     updateCartModal()
+
     cartModal.classList.add("hidden")
+    cartModal.classList.remove("flex")
 })
 
-// 🔐 ACESSO ADMIN (5 cliques no logo)
+// 🔐 ACESSO ADMIN
 let clickCount = 0
 const logo = document.getElementById("logo")
 
